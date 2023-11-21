@@ -1,0 +1,612 @@
+\documentclass{article}
+
+\usepackage{indentfirst} % indents first paragraph of a section
+\usepackage[backend=biber, style=alphabetic]{biblatex}
+\addbibresource{sources.bib}
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{geometry, enumerate}
+\usepackage{float} % allows strict placement of figures
+\usepackage{hyperref}
+\usepackage{xcolor} % defines colour for reference links (hyperref links)
+\hypersetup{colorlinks,
+                linkcolor={red!50!black},
+                citecolor={blue!50!black},
+                urlcolor={blue!50!black}} % define colours for hyperref links
+\usepackage{graphicx, caption, subcaption}
+\usepackage{bookmark}
+\usepackage[nameinlink]{cleveref}
+
+% theorem styles
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}[section]
+
+\makeatletter
+\newtheoremstyle{definition}
+        {\topsep}                                       % space above
+        {\topsep}                                       % space below
+        {\addtolength{\@totalleftmargin}{3.5em}         % body font
+        \addtolength{\linewidth}{-3.5em}
+        \parshape 1 3.5em \linewidth}
+        {}                                              % indent amount
+        {\bfseries}                                     % header font
+        {.}                                             % header punctuation
+        {\newline}                                      % space after theorem header
+        {}                                              % theorem head specifications
+\makeatother
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+% math commands
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\ceil}[1]{\left \lceil #1 \right \rceil}
+\newcommand{\floor}[1]{\left \lfloor #1 \right \rfloor}
+\renewcommand{\deg}{\rm{deg}\,}
+\newcommand{\inner}[2]{\left\langle #1, #2 \right\rangle}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\cl}[1]{\overline{#1}}
+\newcommand{\tr}[1]{\textnormal{Tr}\left(#1\right)}
+
+% convenience commands
+\newcommand{\BH}{\cal{B}(H)}
+\newcommand{\DBH}{\cal{B}^*(H)}
+\newcommand{\PDBH}{\cal{B}_*(H)}
+
+\newcommand{\bb}[1]{\mathbb{#1}}
+\renewcommand{\cal}[1]{\mathcal{#1}}
+
+\setlength{\parskip}{1em}
+\setlength{\parindent}{0em}
+
+\title{A Study of Topologies on Sets of Operators on Hilbert Spaces}
+\author{River McCubbin}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+%TODO fix italics in references
+
+\section{Abstract} \label{sec:abstract}
+
+        This report aims to study various different topologies on bounded linear operators $\BH$. We begin with a brief explanation of topologies, hilbert spaces, and bounded linear operators. 
+        We proceed to define concepts such as trace class operators and dual/pre-dual spaces. 
+        This provides the foundation necessary to discuss the variously defined topologies on $\BH$, and their uses. 
+        There is then a discussion of notable proofs in which these topologies are used, and further discussion of ideas beyond the scope of this report in which these topologies play a significant role.
+
+\section{Introduction} \label{sec:introduction}
+
+        In order to appreciate the content of this report, we begin with a brief overview of the pre-requisite material.
+        This includes a discussion of topologies, nets, Hilbert spaces, operators on hilbert spaces and dual/pre-dual spaces.
+        These topics are important for understanding the topologies on $\BH$ which we discuss in the body of this report.
+
+        \subsection{Topologies} \label{subsec:topologies}
+
+                We begin with a basic definition of a \textit{topology}. 
+                Topologies are used to generalize the idea of open sets, which in turn influence the idea of convergence in a given space.
+                This will be the foundation for the main discussion in this report.
+
+                \begin{definition}[Topology] \label{def:topology}
+                        A set $\tau \subseteq \cal{P}(X)$ is called a \textit{topology} on $X$ if the following properties hold:
+                        \begin{enumerate}
+                        \item $X, \emptyset \in \tau$.
+                        \item Any union of elements in $\tau$ is in $\tau$.
+                        \item Any finite intersection of elements in $\tau$ is in $\tau$.
+                        \end{enumerate}
+                \end{definition}
+                We call the sets in $\tau$ \textit{open}, their complements \textit{closed}.
+
+                We can define topologies directly, or we can \textit{induce} a topology by defining a \textit{norm} or \textit{seminorm}.
+                We define a norm as follows:
+                \begin{definition}[Norm] \label{def:norm}
+                        A function $f : V \to \bb{R}$ on a vector space $V$ is called a \textit{norm} if it satisfies the following properties:
+                        \begin{enumerate}
+                        \item $f(x + y) \leq f(x) + f(y)$ for $x, y \in V$.
+                        \item $f(rx) = \abs{r}f(x)$ for $r \in \bb{F}$.
+                        \item $f(x) = 0 \iff x = 0$.
+                        \end{enumerate}
+                \end{definition}
+                A norm induces a relatively powerful topology, called a \textit{metric} topology due to the fact that we can impose a notion of distance with this norm.
+                We can accomplish a similar, but weaker idea with a \textit{seminorm}, defined as follows:
+                \begin{definition}[Semi-Norm] \label{def:seminorm}
+                        A function $f : V \to \bb{R}$ on a vector space $V$ is called a \textit{seminorm} if it satisfies the following properties:
+                        \begin{enumerate}
+                        \item $f(x + y) \leq f(x) + f(y)$ for $x, y \in V$.
+                        \item $f(rx) = \abs{r}f(x)$ for $r \in \bb{F}$.
+                        \end{enumerate}
+                        
+                        In essence, a seminorm is a norm without the requirement of positive definiteness and point separation.
+                \end{definition}
+
+                With a definition of norm and seminorm, we can define a norm-induced topology as follows:
+                \begin{definition}[Induced Topology] \label{def:induced topology}
+                        Given a vector space $V$ and a norm or seminorm $\norm{\cdot}$, the topology \textit{induced} by the norm is given by taking the basis of the balls about each point $x$, $\{B_r(x) = \{y \mid \norm{x - y} < r\}$.
+                \end{definition}
+                
+                Though differing topologies offer different options in terms of mathematical content, we find a trend in terms of what content is available in a given topology based on the \textit{strength} or \textit{fineness} of a given topology.
+                This idea is made rigorous by the following definition:
+                \begin{definition}[Topology Strength] \label{def:topology strength}
+                        A topology $\tau$ is said to be \textit{stronger} or \textit{finer} than a topology $\sigma$, which is said to be \textit{weaker} or \textit{coarser}, if $\tau$ contains all of the open sets of $\sigma$.
+                \end{definition}
+                This definition allows for a partial ordering of topologies on the same sets.
+                This partial ordering allows for the generalization and transferring of certain ideas between differing topologies.
+                Equivalently to the definition above, we have the following:
+                \begin{theorem}
+                        If $(X, \tau_1)$ is finer than $(X, \tau_2)$ then the identity map $i: (X, \tau_1) \to (X, \tau_2)$ is continuous.
+                \end{theorem}
+                This added notion of strength allows us a sometimes easier proof of relative strength between topologies.
+
+
+        \subsection{Nets} \label{sec:nets}
+
+                In order to appropriately discuss these topologies, we require an abstraction of a sequence for use in topological spaces.
+                This in turn requires a notion of a \textit{directed set}, which replaces the traditional natural number indexing of a sequence.
+                \begin{definition}[Directed Set] \label{def:directed set}
+                        A set $A$ is called \textit{directed} if for any $a, b \in A$ there exists $c$ such that $a \leq c$ and $b \leq c$.
+                \end{definition}
+                We apply this definition to our generalized notion of a sequence, called a \textit{net}:
+                \begin{definition}[Net] \label{def:net}
+                        A function $f : A \to X$ is called a \textit{net} when $A$ is a directed set.
+                \end{definition}
+                Given this generalized notion of sequences, we clearly desire a generalized notion of convergence as well.
+                Convergence of a net is defined in terms of the topology of a given space, and so we leave the definitions of convergence in a given topology to later sections in which they are needed, other than the following examples:
+                \begin{definition}[Weak Convergence] \label{def:weak convergence}
+                        A net $\{a_\alpha\}$ \textit{converges weakly} to $a$ if $\inner{x}{x_\alpha y} \to \inner{x}{ay}$.
+                \end{definition}
+
+                \begin{definition}[Strong Convergence] \label{def:strong convergence}
+                        A net $\{a_\alpha\}$ \textit{converges strongly} to $a$ if $\norm{(a_\alpha - a)x} \to 0$ for all $x \in H$.
+                \end{definition}
+
+                These notions of convergence are simply an example of how topologies vary how we perceive convergence of a net or sequence in a given topology.
+
+        \subsection{Hilbert Spaces} \label{subsec:hilbert}
+                
+                For this report we will be discussing particularly the topologies applied to operators on \textit{Hilbert} spaces.
+                We choose to study these spaces in particular because these operators are those most frequently used, and with the most analytical content available to be studied at this level.
+                A \textit{Hilbert} space is defined as follows:
+                \begin{definition}[Hilbert Space] \label{def:hilbert space}
+                        A vector space $H$ is called a \textit{Hilbert space} if $H$ is equipped with an inner product that induces a complete metric, i.e. a metric such that every cauchy sequence in $H$ converges in $H$.
+                \end{definition}
+                Notice that above we defined the notion of a metric in terms of topology.
+                As a Hilbert space requires a metric, we have an induced topology on $H$.
+                This is not to be confused with the topology which we apply to the space of bounded operators (defined in \cref{subsec:operators}) $\BH$.
+        
+        \subsection{Operators On Hilbert Spaces} \label{subsec:operators}
+                
+                With an understanding of topologies and the underlying Hilbert spaces, we can now discuss the space of \textit{bounded linear operators} $\BH$ on $H$.
+                This will be the primary focus of this report, as this space allows the most interesting study of topologies on operators on Hilbert spaces.
+                \begin{definition}[Bounded Linear Operator] \label{def:BLO}
+                        A linear transformation $T : X \to Y$ between normed linear spaces is called a \textit{bounded linear operator} if it satisfies $\norm{Tx}_Y \leq M \norm{x}_X$ for some $M > 0$.
+                \end{definition}
+                The set of bounded linear operators on a Hilbert space $H$ forms a vector space of its own, denoted $\BH$.
+                As is natural for a vector space, it is assigned various topologies, and each of these topologies provides different tools which allow unique and interesting ideas to be represented.
+        
+
+        \subsection{Dual/Pre-Dual Spaces} \label{sec:dual}
+
+                In order to understand some of the more complex topologies on $\BH$ we require an understanding of \textit{dual} and \textit{pre-dual} spaces.
+                We define the dual of a vector space as follows:
+                \begin{definition}[Dual] \label{def:dual}
+                        The \textit{dual} of a vector space $V$ over a field $\bb{F}$, denoted $V^*$, is the set of all linear maps $\phi : V \to \bb{F}$.
+                \end{definition}
+                Notice that this space is the space of linear operators on $H$.
+
+                With this concept of a dual space, we find also the concept of a pre-dual, defined as follows:
+                \begin{definition}[Pre-Dual] \label{def:predual}
+                        The \textit{pre-dual} of a vector space $V$ is the space $V_*$ such that $V_*$'s dual, $V_*^* = V$.
+                \end{definition}
+                Notice that it is not necessarily the case that $V^{**} = V$ (i.e. the dual of the dual is not necessarily the original space), hence the important distinction between dual and pre-dual. 
+                
+                The elements of $\PDBH$ are called \textit{trace class operators} and are defined as follows:
+                \begin{definition}[Trace Class Operators] \label{def:TCO}
+                        An operator $T$ is called a \textit{trace class operator} if we can define a finite \textit{trace} given by
+                                $$\sum_n \inner{e_n}{T_n}$$
+                        that is independent of the orthonormal basis $\cal{B} = \{e_i\}$.
+                        We denote the trace $\tr{T}$.
+                \end{definition}
+                This space is important for a correct understanding of the topologies that follow.
+
+
+\section{Operator Topologies} \label{sec:operator topologies}
+
+        Proceeding with a general understanding of both topologies and operators on Hilbert spaces, we can now discuss the different topologies available on these spaces.
+        
+        \subsection{Norm Topology} \label{subsec:norm topology}
+                The norm topology is the simplest topology available on $\BH$.
+                This topology is that induced by the operator norm, given by
+                        $$\norm{T} = \sup\{\norm{Tx} \mid \norm{x} \leq 1\}$$
+                for $x \in H$.
+                This topology defines a complete metric on $\BH$.
+
+        \subsection{Strong Operator Topology} \label{subsec:SOT}
+
+                The strong operator topology (SOT) is the weakest topology such that $T \to Tx$ is continuous in $T$ for a given $x \in H$.
+                It is induced by the seminorms given by 
+                        $$T \mapsto \norm{Tx}$$
+                for $x \in H$.
+
+        \subsection{Weak Operator Topology} \label{subsec:WOT}
+                
+                The weak operator topology (WOT) is the weakest topology such that the functional $\phi$ mapping $T \mapsto \inner{Tx}{y}$ is continuous for any $x, y \in H$.
+                If we suppose that the underlying field of our vector spaces possesses a norm, then the weak operator topology is induced by the semi-norms given by 
+                        $$T \mapsto \abs{y^*(Tx)}$$
+                for $x \in H, y^* \in H^*$.
+
+        \subsection{Ultra-Strong Topology} \label{subsec:UST}
+
+                The ultra-strong topology is the strongest topology such that the dual is the full pre-dual $\PDBH$ of all trace class operators.
+                We define the ultra-strong operator topology similarly to the strong operator with semi-norms given by 
+                        $$T \mapsto S(T^* T)^\frac{1}{2}$$
+                with positive $S\in \PDBH$.
+
+        \subsection{Ultra-Weak Topology} \label{subsec:UWT}
+                The ultra-weak topology is the weakest topology such that all elements of the predual $\PDBH$ are continuous as functions on $\BH$.
+                It is generated by the semi-norms given by 
+                        $$ T \mapsto \abs{\tr{ST}}$$
+                for $S \in \PDBH$.
+
+                It is worth noting that the weak* topology on $\BH$ is equivalent to the ultra-weak topology.
+                
+        \subsection{Ultra-Strong* Topology} \label{subsec:USST}
+
+                The ultra-strong* topology is the weakest topology that is both stronger than the ultrastrong topology and maintains continuity of the adjoint map. It is also locally convex, and is induced by the semi-norms given by 
+                        $$ T \mapsto S(T^* T)^\frac{1}{2} $$
+                and 
+                        $$ T \mapsto S(T^{**}T^{*})^\frac{1}{2}$$
+                for positive $S \in \PDBH$.
+
+        \subsection{Strong* Topology} \label{subsec:SST}
+
+                The strong* topology is stronger than the strong and weak operator topologies, and is induced by the semi-norms given by
+                        $$\norm{Tx}$$
+                and 
+                        $$\norm{T^* x}$$
+                for $x \in H$.
+
+        \subsection{Weak Banach Topology} \label{subsec:WBT}
+
+                The weak Banach topology is the weakest topology such that all elements of $\DBH$ are continuous.
+                This open sets in this topology are generated by the basis of the sets of the form $\phi^{-1}(U)$ where $U$ is open in $H$ and $\phi \in H^*$.
+
+        \subsection{Arens-Mackey Topology} \label{subsec:AMT}
+
+                The Arens-Mackey topology is the strongest locally convex topology on $\BH$ such that the dual space is $\DBH$.
+                It is beyond the scope of this report, and as such is only mentioned for the sake of completeness.
+
+
+\section{Topology Strength} \label{sec:topology strength}
+
+        With these topologies now defined, we can create a partial ordering of these topologies thanks to the notion of strength of a topology defined in \cref{def:topology strength}.
+        Recall that the strength of topology is not necessarily correlated to its utility; in fact, we often desire weaker topologies as they provide fewer constraints that must be met in order to accomplish a particular goal.
+
+        \subsection{Heirarchy of Operator Topologies} \label{subsec:heirarchy}
+
+                To order the topologies we have discussed on $\BH$ we require a partial ordering.
+                In essence, we must examine the comparibility of each of these topologies pairwise. For the sake of brevity, the proofs of these are left to references when possible, and only the orderings that apply are listed below.
+
+                \begin{theorem}
+                        All topologies on $\BH$ are weaker than the norm topology.\cite{cycr}
+                \end{theorem}
+                \begin{proof}
+                        The proof of this is simple, as the other topologies are induced by seminorms which are clearly weaker than the operator norm.
+                \end{proof}
+                
+                \begin{theorem}
+                        The weak Banach topology is stronger than the ultra-weak topology.
+                \end{theorem}
+                \begin{proof}
+                        The proof of this is given in \cite{reed}
+                \end{proof}
+                
+                \begin{theorem}
+                        The Arens-Mackey topology is stronger than the ultrastrong* topology.
+                \end{theorem}
+                \begin{proof}
+                        The proof of this is entailed by the Mackey-Arens theorem, the proof of which is beyond the scope of this report.
+                \end{proof}
+
+                \begin{theorem}
+                        The ultra-strong* topology is stronger than the ultra-strong topology.
+                \end{theorem}
+                \begin{proof}
+                        The ultra-strong* topology is trvially stronger than the ultra-weak since it is generated by the same semi-norms of the form
+                                $$T \mapsto S(T^*T)^\frac{1}{2}$$
+                        and as such generates the same open sets, as well as any additional open sets generated by the semi-norms of the form 
+                                $$T \mapsto S(T^{**}T^*)^\frac{1}{2}.$$
+                \end{proof}
+
+                \begin{theorem}
+                        The ultra-strong* topology is stronger than the strong* topology.
+                \end{theorem}
+                \begin{proof}
+                        The proof of this is given in \cite{cycr}.
+                \end{proof}
+                
+                \begin{theorem}
+                        The ultra-strong topology is stronger than the ultra-weak topology.
+                \end{theorem}
+                \begin{proof}
+                        The proof of this is given in \cite{cycr}.
+                \end{proof}
+
+                \begin{theorem}
+                        The ultra-strong topology is stronger than the strong operator topology.
+                \end{theorem}
+                \begin{proof}
+                        The proof of this is given in \cite{cycr}.
+                \end{proof}
+
+                \begin{theorem}
+                        The strong* topology is stronger than the strong operator topology.
+                \end{theorem}
+                \begin{proof}
+                        This is trivially true since it is generated by the same semi-norms
+                                $$T \mapsto \norm{Tx}$$
+                        and hence all of the same open sets, as well as the semi-norms of the form 
+                                $$T \mapsto \norm{T^*x}$$
+                        which generates more open sets.
+                \end{proof}
+                
+                \begin{theorem}
+                        The ultra-weak topology is stronger than the weak operator topology.
+                \end{theorem}
+                \begin{proof}
+                        The proof of this is given in \cite{cycr}.
+                \end{proof}
+                
+                \begin{theorem}
+                        The strong operator topology is stronger than the weak operator topology.
+                \end{theorem}
+                \begin{proof}
+                        To show this, we consider the forward shift operator $S \in \BH$ with each of these topologies.\\
+                        Let $S^n$ denote $S \circ S \circ \dots S$, $n$ times.
+
+                        For the weak operator topology, we have that $S^n \to 0$:
+                        Consider $\lim_{n\to\infty} \inner{S^ng}{h}$ for $h, g \in H$.\\
+                        Notice that $\inner{S^n g}{h} = \sum_{i=0}^n + \sum_{i=n}^\infty g_i \overline{h_i}$.\\
+                        Clearly $\lim_{n\to\infty} \sum_{i=n}^\infty g_i \overline{h_i} = 0$.\\
+                        Hence $S^n \to 0$ in the weak operator topology.
+
+                        Suppose that $S^n \to 0$ in the strong operator topology, i.e. $\forall \epsilon > 0, \exists N > 0$ such that $n > N \implies \norm{S^nx - 0} = \norm{S^n x} < \epsilon$.\\
+                        Notice that $\norm{S^n x}^2 = \sum_{i=1}^n 0 + \sum_{i=1}^\infty \abs{x_i}^2 = \norm{x}^2$.\\
+                        Then $\norm{S^n x} = \norm{x}$ for all $n$.\\
+                        Clearly this is not $0$ in general, hence $S^n$ does not converge to 0 in the strong operator topology.
+
+                        This shows that there is a neighbourhood in the strong operator topology that separates $S^n x$ from 0, but not in the weak operator topology. Hence the strong operator topology is stronger than the weak operator topology, as wanted.
+                \end{proof}
+
+                Each of these comparisons is in fact a strict comparison in general, though for certain Hilbert spaces we find that these topologies coincide, for example in \cref{thm:bounded} and in \cref{thm:unitary}.
+
+                This collection of comparisons gives the following heirarchy of topologies on $\BH$:
+                \begin{figure}[H]
+                        \centering
+                        \includegraphics[width=0.45\textwidth]{heirarchy.png}
+                        \caption{A heirarchy of the topologies available on $\BH$}
+                        \label{fig:heirarchy}
+                        \cite{heirarchy}
+                \end{figure}
+
+\section{Topology Use} \label{sec:topology use}
+
+        % BH is non-separable in the norm topology
+        As mentioned before, different topologies offer different benefits and drawbacks, and so choosing an appropriate topology for a given problem is important.
+        As an example, consider $\BH$ with the norm topology.
+        Equipped with the norm topology, $\BH$ is Banach, a very convenient property when examining sequences; the downside is that when equipped with the norm topology, $\BH$ is non-separable.
+        \begin{theorem}
+                $(\BH, \norm{\cdot}_{op})$ is a normed Banach space.
+        \end{theorem}
+        \begin{proof}
+                We first confirm that the operator norm satisfies the norm property.\\
+                Let $T, S \in \BH$ and $\lambda \in \bb{F}$.\\
+                Notice first that $\norm{T} = 0 \iff T = 0$ by definition of operator norm, and that $\norm{T} \geq 0$.\\
+                We now confirm linearity:
+                Let $x \in H$.\\
+                Consider $\norm{\lambda T}$:
+                \begin{align*}
+                        \norm{\lambda T} 
+                        &= \sup\{\norm{(\lambda T)x} \mid \norm{x} \leq 1\} & \text{by definition of operator norm}\\
+                        &= \sup\{\norm{\lambda T x} \mid \norm{x} \leq 1\} & \text{since operations are defined pointwise}\\
+                        &= \sup\{\abs{\lambda} \norm{Tx} \mid \norm{x} \leq 1\} & \text{by norm properties of $H$}\\
+                        &= \abs{\lambda} \sup\{\norm{Tx} \mid \norm{x} \leq 1\}\\
+                        &= \abs{\lambda} \norm{T} & \text{by definition of operator norm}
+                \end{align*}
+                
+                Now consider $\norm{T + S}$:
+                \begin{align*}
+                        \norm{T + S}
+                        &= \sup\{\norm{(T + S)x} \mid \norm{x} \leq 1\} & \text{by definition of operator norm}\\
+                        &= \sup\{\norm{Tx + Sx} \mid \norm{x} \leq 1\} & \text{since operations are defined pointwise}\\
+                        &\leq \sup\{\norm{Tx} + \norm{Sx} \mid \norm{x} \leq 1\} & \text{by norm properties of $H$}\\
+                        &\leq \sup\{\norm{Tx} \mid \norm{x} \leq 1\} + \sup\{\norm{Sx} \mid \norm{x} \leq 1\} & \text{by sup properties}\\
+                        &= \norm{T} + \norm{S} & \text{by definition of operator norm}
+                \end{align*}
+
+                Therefore $\BH$ is a normed linear space.
+
+                We now verify that $(\BH, \norm{\cdot}_{op})$ is Banach:
+                Notice that $H$ is Banach since it is Hilbert, hence any cauchy sequence in $H$ converges in $H$.\\
+                We can write any cauchy sequence in $H$ as $\{A_n x\}$ for some sequence $\{A_n\}$ in $\BH$.\\
+                Since $\{A_n x\}$ is a cauchy sequence in $H$, it must converge to some value $y \in H$.\\
+                Since $y \in H$, we can write $y = Ax$ for some $A \in \BH$.\\
+                This gives that $\{A_n x\} \to Ax$, and hence $\{A_n\} \to A$.\\
+                Therefore any cauchy sequence in $\BH$ converges, and $\BH$ is Banach, as wanted.
+        \end{proof}
+        We omit the proofs required in this report, but this is the only topology on $\BH$ for which $\BH$ is Banach.
+        Clearly this property makes $(\BH, \norm{\cdot}_{op})$ the most useful topology when discussing sequences.
+        Though, as mentioned, we do have the following drawback for $(\BH, \norm{\cdot}_{op})$:
+        \begin{theorem}
+                $(\BH, \norm{\cdot}_{op})$ is non-separable.
+        \end{theorem}
+        \begin{proof}
+                Recall that a space is separable if it contains a countable dense subset.\\
+                Let $U \subset \BH$ be an uncountable subset.\\
+                Suppose for all $x, y \in U$ that $\norm{x - y} \geq r$ for $r > 0$.\\
+                Let $C$ be a countable subset of $\BH$.\\
+                Then $C \cap B_\frac{r}{2}(x) \neq \emptyset$ for only a countable number of points $x \in U$.\\
+                Consider $\bigcup B_\frac{r}{2}(x)$ such that $B_\frac{r}{2}(x) \cap C = \emptyset$.\\
+                Notice that this is a non-empty open subset of $\BH$ that does not include any points in $C$.\\
+                Therefore $\BH$ does not contain a countable dense subset, as wanted.
+        \end{proof}
+
+
+        % strong and ultrastrong lack continuity of adjoint
+        Similarly, the strong and ultra-strong topologies are often used as they are some of the more convenient topologies to apply, but they lack continuity of the adjoint map. This is solved by instead using their respective $^*$ variants.
+        To show this, we first require Bessel's inequality:
+        \begin{theorem}[Bessel's Inequality]
+                If $H \ni x$ is a Hilbert space and $\{e_n\}$ is an orthonormal sequence then
+                        $$ \sum_{n=1}^\infty \abs{\inner{x}{e_n}}^2 \leq \norm{x}^2.$$
+        \end{theorem}
+        Notice that since this sum converges, we have necessarily that $\lim_{n\to\infty} \abs{\inner{x}{e_n}} = 0$.
+
+        \begin{theorem}
+                The adjoint map $^* : \BH \to \BH$ is not continuous in the strong operator topology.
+        \end{theorem}
+        \begin{proof}
+                Recall that the strong topology is induced by the seminorms of the form $\norm{T} = \norm{Tx}$ for $x \in H$.\\
+                Define the operator $xTy \in BH$ such that $xTy(z) = \inner{z}{y}{x}$ for $x, y \in H$ given.\\
+                Notice that $(xTy)^*$ is given by $yTx$.
+
+                Let $\cal{B} = \{e_n\}$ be an orthonormal basis for $H$.\\
+                Given $x \in H$, we have that
+                        $$ \lim_{n\to\infty} \norm{e_1 T e_n}_x = \lim_{n\to\infty} \abs{\inner{x}{e_n}} = 0$$
+                by Bessel's inequality.
+
+                Notice also that 
+                        $$\lim_{n\to\infty} \norm{(e_1 T e_n)^*}_x = \lim_{n\to\infty} \norm{e_n T e_1}_x = \abs{\inner{x}{e_1}}$$
+                which is, in general, not 0.
+
+                Hence $^*$ is not continuous in $(\BH, SOT)$, as wanted.
+        \end{proof}
+
+        \begin{theorem}
+                The adjoint map is continuous in the strong* topology.
+        \end{theorem}
+        \begin{proof}
+                The proof of this is simple since the seminorms that induce the strong* topology include the seminorms of the adjoint operators.\\
+                Clearly, the adjoint operators are continuous in their norms, and hence they are continuous in the strong* topology, as wanted.
+        \end{proof}
+        So if we desire a continous adjoint, a commonly desired property, we are forced to endure the added complexity of the strong* or ultra-strong* topologies.
+
+        % weak operator for compactness
+        Despite being the weakest topology on $\BH$ as shown in \cref{fig:heirarchy}, the weak operator topology is commonly used for arguments involving compactness, as it is the simplest of the mentioned topologies for which the unit ball is compact.
+        This is proven using the Banach-Alaoglu Theorem:
+        \begin{theorem}[Banach-Alaoglu] \label{thm:BA}
+                A topological vector space $X$ with continuous dual space $X'$ satisfies that the polar
+                        $$U^\circ = \{f \in X' \mid \sup_{u \in U} \abs{f(u)} \leq 1\}$$
+                of any neighbourhood $U$ of the origin in $X$ is compact in the weak* topology on $X'$.
+        \end{theorem}
+        \begin{theorem}
+                The unit ball is compact in $(\BH, WOT)$.
+        \end{theorem}
+        \begin{proof}
+                Recall that $\PDBH$ is the predual of $\BH$.\\
+                We consider the weak* topology on $\PDBH$.\\
+                Notice that the dual of this space is $\BH$, which is clearly continuous.\\
+                Then by the Banach-Alaoglu theorem, we have that the polar $U^\circ$ of any nieghbourhood $U$ of the origin in $\PDBH$ is compact in weak* topology on $\BH$.\\
+                Choosing $U$ to be the unit ball in $\PDBH$ we have that the unit ball in $\BH$ is compact in the weak* topology.
+
+                For $\BH$, we have that the weak* topology is equivalent to the ultra-weak topology, hence the unit ball is compact in the ultra-weak topology.\\ %TODO include a proof of this
+                Recall that if a set $U$ is compact in topology $\tau \supset \sigma$ then $U$ is compact in $\sigma$ as well.\\
+                Since the weak operator topology is weaker than the ultra-weak topology, we have that the unit ball is compact in the weak operator topology, as wanted.
+        \end{proof}
+
+        % ultra variants coincide on bounded sets
+        For norm bounded sets, we have that the ultra-strong and ultra-weak topologies coincide with the strong and weak operator topologies respectively.
+        Thanks to this, we can reduce any problems on bounded sets to the simpler operator topologies.
+        \begin{theorem}\label{thm:bounded}
+                The ultra-strong topology and ultra-weak topology are equivalent to the strong operator topology and weak operator topology respectively on norm-bounded sets.
+        \end{theorem}
+        To prove this we first make note of an important property:
+        \begin{theorem} \label{thm:bounded convergence}
+                If $\{T_\alpha\}$ is a norm-bounded net in $\BH$ then $T_\alpha \to T$ in the strong/weak operator topology iff $T_\alpha A \to TA$ strongly/weakly for a dense subset of $A$.
+        \end{theorem}
+        With this we have the tools to prove \cref{thm:bounded}
+        \begin{proof}
+                Notice that the identity map from the weak operator topology to the ultra-weak topology is continuous and injective when restricted to the unit ball of $\BH$.\\
+                By \cref{thm:BA} we have that the unit ball is compact in $\BH$ with the ultra-weak topology.\\
+                Since the domain of this function is compact, we have that this is a homeomorphism.\\
+                Hence the weak operator and ultra-weak topologies coincide on the unit ball.\\
+                Replacing the unit ball $B$ with $nB$ for $n \in \bb{N}$, we have that the two coincide on any norm-bounded sets. \cite{pedersen}
+        \end{proof}
+        The proof for the ultra-strong and strong operator topologies is beyond the scope of this report, but is covered in \cite{cycr}.
+
+        % topologies coincide on unitary operators
+        Another interesting notion is the follwing:
+        \begin{theorem} \label{thm:unitary}
+                The strong, weak, ultra-strong, ultra-weak, and strong*  topologies all coincide on the set of unitary operators $\cal{U}(H) = \{T \in \BH \mid T^* T = T T^* = I\}$.
+        \end{theorem}
+        This allows us to choose nearly any topology we please when considering unitary operators; an important property, since unitary operators are common and very important in many applications.
+        To prove that this is the case, we first require a lemma:
+        \begin{lemma} \label{lemma:net}
+                If $T_\alpha \to T$ weakly then $\norm{T} \leq \liminf \norm{T_\alpha}$ and $T_\alpha \to T$ in norm iff $\norm{T_\alpha} \to \norm{T}$.
+        \end{lemma}
+        \begin{proof}
+                Recall from \cref{def:weak convergence} that a net $T_\alpha \to T$ if $\inner{T_\alpha}{S} \to \inner{T}{S}$ for all $S \in \BH$.\\
+                Notice first that
+                \begin{align*}
+                \norm{T}^2 &= \inner{T}{T}\\
+                &= \lim \inner{T_\alpha}{T} & \text{since $T_\alpha \to T$}\\
+                &\leq \norm{T} \liminf \norm{T_\alpha} & \text{by Cauchy-Schwartz}\\
+                \end{align*}
+                which implies
+                        $$ \norm{T} \leq \liminf \norm{T_\alpha}.$$
+                Notice also that 
+                $$\norm{T_\alpha - T}^2 = \inner{T_\alpha}{T_\alpha} - \inner{T_\alpha}{T} - \inner{T}{T_\alpha} + \inner{T}{T}$$
+                which tends to 0 iff $\norm{T_\alpha} \to \norm{T}$, as wanted.\cite{cycr}
+        \end{proof}
+        With this we can now prove \cref{thm:unitary}:
+        \begin{proof}
+                Let $T$ be a unitary operator.\\
+                By \cref{lemma:net} we have that if $T_\alpha \to T$ then $\norm{T_\alpha} \to \norm{T}$.\\
+                This gives that the strong and weak operator topologies coincide on $\cal{U}$.
+
+                Recall that the set of unitary operators has the property that their inverses are their adjoints.\\
+                Since $\BH$ is the set of bounded operators we have that they are continuous, and since their inverses exist we have that their inverses are continuous as well.\\
+                The difference between the strong and strong* topologies are the continuity of the adjoint, and hence since the adjoint is continuous on this space we have that these topologies are equivalent.
+
+                Lastly, notice that a unitary operator is necessarily an isometry since $T^*T = TT^* = I$.\\
+                Hence we have that $\cal{U}$ is bounded.\\
+                Then by \cref{thm:bounded} we have that the ultra-strong and ultra-weak topologies coincide with the strong and weak operator topologies respectively on $U$.
+
+                From these equivalences we see that the strong, weak, ultra-strong, ultra-weak, and strong* topologies coincide on the set of unitary operators, as wanted.
+        \end{proof}
+        In fact, the previous claim also holds for the ultra-strong* topology, but the proof of this is beyond the scope of this report.
+
+        In conclusion, we re-iterate that it is important to choose the correct topology when studying $\BH$.
+        In general, the norm, strong operator, and weak operator topologies are chosen, as they are the simplest topologies to define and apply.
+        When needed, the ultra-weak and ultra-strong are used in place of the weak and strong topologies, as they result in better behaved duals.
+        When adjoint operators are of importance, the strong* and ultra-strong* topologies are used, as they ensure that the adjoints are continuous.
+        The remaining topologies are rarely used, but each exists for a reason, and each has its place.
+        
+\section{Further Topics of Note} \label{sec:proofs}
+
+        %TODO unit operators are a topological group from cycr
+        We conclude with a discussion of important topics that we were unable to discuss in this report.
+        These include notions that were intentionally skipped due to their difficulty, and extensions of the content discussed here.
+
+        The first of these is the Arens-Mackey topology, and with it the Mackey-Arens theorem.
+        This topology was mentioned for the sake of completeness, and in fairness is a quite obscure topology.
+        Despite its obscureness it is extremely important for select applications, as it proven to be the strongest topology which preserves the continuous dual.
+        In simpler terms, this means that it does not make continuous any linear functionals that were discontinuous in the norm topology, a property which does not hold for most topologies. 
+        This property makes the Arens-Mackey topology particularly useful for studying the behaviour of linear functionals in $\BH$.
+
+        The second topic is the topological group on $\cal{U}(H)$. This was briefly mentioned when discussing the topologies that coincide on the unitary operators of $\BH$, but there is much left to study on this topic in a more topological vein.
+
+        Lastly, we require mention of the numerous topics that were applied here, but remain as notable areas of study in their own rights.
+        
+        These include $C^*$ and $\sigma$ algebras, which are closesly related to the ultra- topologies mentioned in this report. In fact, the ultra topologies are often also called $\sigma$ topologies, as they are often characterized by $\sigma$ algebras which generate them.
+
+        Duality, dual spaces and reflexivity are all very important topics in functional analysis. 
+        Duality was mentioned here in order to appropriately understand the structure of the topologies mentioned, but is a topic that extends far beyond only this.
+        Reflexivity is an important property that ties in closely to these topologies, but is rather difficult to introduce in a meaningful way without significant contributions, and so was omitted from this report.
+
+        Similarly to duality, trace class operators were mentioned in this report for the sake of better understanding the structure of these topologies, but their importance extends far beyond their role in these topological definitions. These operators are the natural next area of study after the bounded linear operators of $\BH$.
+
+
+\newpage
+\nocite{*}
+\printbibliography
+
+\end{document}
